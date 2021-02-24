@@ -39,6 +39,7 @@ def dijkstra_modified(cell1: Cell, cell2: Cell, board: Board) -> List[Cell]:
     prev_step = {cell1: None}
     current_cost = {cell1: 0}
     possible_moves_for_other_snakes = possible_head_moves([Cell(snake.head.x, snake.head.y) for snake in board.snakes])
+    print(possible_moves_for_other_snakes)
     while not path.empty():
         current = path.get()[1]
 
