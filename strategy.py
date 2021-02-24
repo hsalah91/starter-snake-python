@@ -94,7 +94,7 @@ def safe_move(request: MovePostRequest, move: Move, skip_enemies_possible_moves:
 
 
 def do_we_want_nearest_food(request: MovePostRequest) -> bool:
-    if request.you.health <= 30:
+    if request.you.health <= 60:
         return True
     else:
         max_snake_size = 0
@@ -129,6 +129,56 @@ def find_desired_food(request: MovePostRequest):
     return desired_food
 
 
+def not_snake_or_hazard(cell, board):
+    if cell in board.hazards:
+        return False
+    for snake in board.snakes:
+        if cell in snake.body:
+            return False
+
+    return True;
+
+
+def calculate_food_safety_score(food, board):
+    score = 0
+    margin = 6
+    # get bottom left as we treat the food as if it is in the center
+    start_x = food.x - margin/2
+    start_y = food.y - margin/2
+    for i in range(margin):
+        for j in range(margin):
+            if not_snake_or_hazard(Cell(start_x + i, start_y + j), board):
+                score+= 1
+    return score
+
+def calculate_score(food, board ,request):
+    score = 0;
+    distance_from_my_head = dist_between_cells(food, request.you.head) + 1
+    safety = calculate_food_safety_score(food, board)
+    health = request.you.health
+
+    score = (1/health) + (1/distance_from_my_head) + safety
+    score = score * 1000
+    return score
+
+def evaluate_food(board, request: MovePostRequest):
+    ranked_food = []
+    for food in board.food:
+        if food in board.hazards:
+            # hazarded food is not good for us
+            ranked_food.append(RankedCell(Cell(food.x, food.y), -1))
+        else:
+            ranked_food.append(RankedCell(Cell(food.x, food.y), calculate_score(food, board ,request)))
+
+
+    desired_food = ranked_food[0]
+    for food in ranked_food:
+        desired_food = max(desired_food, food)
+
+    return desired_food.cell
+
+
+
 def find_desired_food_far_from_enemies(request: MovePostRequest):
     my_head = request.you.head
     desired_food = request.board.food[0]
@@ -153,13 +203,14 @@ def find_desired_food_far_from_enemies(request: MovePostRequest):
     return desired_food
 
 
+
 def find_move_to_food(request: MovePostRequest):
     if not request.board.food:
-        # no food in the board
+        # no food in the board ... instead  chase tail ?
         return None
 
     my_head = request.you.head
-    desired_food = find_desired_food(request)
+    desired_food = evaluate_food(request.board, request)
 
     # find path to the food
     path = dijkstra_modified(my_head, desired_food, request.board, request.you.id)
@@ -170,4 +221,4 @@ def find_move_to_food(request: MovePostRequest):
     if safe_move(request, move):
         return move
     else:
-        return None
+        return None # no food in the board ... instead  chase tail more safe ?

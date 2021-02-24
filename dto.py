@@ -16,7 +16,6 @@ class Game:
     id: str
     timeout: str
 
-
 @dataclass_json
 @dataclass
 class Cell:
@@ -34,6 +33,21 @@ class Cell:
             return self.y < other.y
         else:
             return self.x < other.x
+
+@dataclass_json
+@dataclass
+class RankedCell:
+    cell: Cell
+    rank: int = 0
+
+    def __hash__(self):
+        return hash(self.cell.x * 10000000 + self.cell.y)
+
+    def __eq__(self, other):
+        return self.cell.x == other.x and self.cell.y == other.y
+
+    def __lt__(self, other):
+        return self.rank < other.rank
 
 
 @dataclass_json
