@@ -49,7 +49,7 @@ def dijkstra_modified(cell1: Cell, cell2: Cell, board: Board, you = "") -> List[
 
         for i in range(4):
             next_cell = Cell(current.x + DX[i], current.y + DY[i])
-            if next_cell in possible_moves_for_other_snakes and not is_cell_achievable(next_cell, board, current_cost[current] + 1):
+            if next_cell in possible_moves_for_other_snakes or not is_cell_achievable(next_cell, board, current_cost[current] + 1):
                 continue
 
             new_cost = current_cost[current] + 1
