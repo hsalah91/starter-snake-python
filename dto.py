@@ -26,6 +26,9 @@ class Cell:
     def __hash__(self):
         return hash(self.x * 10000000 + self.y)
 
+    def __eq__(self, other):
+        return self.x == other.x and self.y == other.y
+
     def __lt__(self, other):
         if self.x == other.x:
             return self.y < other.y

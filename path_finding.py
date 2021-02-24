@@ -20,10 +20,17 @@ def is_cell_achievable(cell: Cell, board: Board, deep: int = 1) -> bool:
     # if we will be in the cell in {deep} steps, then this part of tail can be skipped
     for snake in board.snakes:
         for c in snake.body[:-deep]:
-            if are_cells_equal(c, cell):
+            if are_cells_equal(c, cell) :
                 return False
 
     return True
+
+def possible_head_moves(snakes_heads):
+    possible_moves = set()
+    for head in snakes_heads:
+        for i in range(4):
+            possible_moves.add(Cell(head.x + DX[i], head.y + DY[i]))
+    return possible_moves
 
 
 def dijkstra_modified(cell1: Cell, cell2: Cell, board: Board) -> List[Cell]:
@@ -31,7 +38,7 @@ def dijkstra_modified(cell1: Cell, cell2: Cell, board: Board) -> List[Cell]:
     path.put((0, cell1))
     prev_step = {cell1: None}
     current_cost = {cell1: 0}
-
+    possible_moves_for_other_snakes = possible_head_moves([Cell(snake.head.x, snake.head.y) for snake in board.snakes])
     while not path.empty():
         current = path.get()[1]
 
@@ -40,7 +47,7 @@ def dijkstra_modified(cell1: Cell, cell2: Cell, board: Board) -> List[Cell]:
 
         for i in range(4):
             next_cell = Cell(current.x + DX[i], current.y + DY[i])
-            if not is_cell_achievable(next_cell, board, current_cost[current] + 1):
+            if next_cell in possible_moves_for_other_snakes and not is_cell_achievable(next_cell, board, current_cost[current] + 1):
                 continue
 
             new_cost = current_cost[current] + 1
