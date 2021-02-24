@@ -162,7 +162,7 @@ def find_move_to_food(request: MovePostRequest):
     desired_food = find_desired_food(request)
 
     # find path to the food
-    path = dijkstra_modified(my_head, desired_food, request.board)
+    path = dijkstra_modified(my_head, desired_food, request.board, request.you.id)
     if not path:
         return None
 

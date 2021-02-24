@@ -33,12 +33,12 @@ def possible_head_moves(snakes_heads):
     return possible_moves
 
 
-def dijkstra_modified(cell1: Cell, cell2: Cell, board: Board) -> List[Cell]:
+def dijkstra_modified(cell1: Cell, cell2: Cell, board: Board, you = "") -> List[Cell]:
     path = PriorityQueue()
     path.put((0, cell1))
     prev_step = {cell1: None}
     current_cost = {cell1: 0}
-    possible_moves_for_other_snakes = possible_head_moves([Cell(snake.head.x, snake.head.y) for snake in board.snakes])
+    possible_moves_for_other_snakes = possible_head_moves([Cell(snake.head.x, snake.head.y) for snake in board.snakes if snake.id != you])
     print ('Hateeeeeem')
     print(possible_moves_for_other_snakes)
     while not path.empty():
