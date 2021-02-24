@@ -1,12 +1,8 @@
 import os
-import random
 
 import cherrypy
-
-"""
-This is a simple Battlesnake server written in Python.
-For instructions see https://github.com/BattlesnakeOfficial/starter-snake-python/README.md
-"""
+from dto import *
+from strategy import make_next_move
 
 
 class Battlesnake(object):
@@ -18,9 +14,9 @@ class Battlesnake(object):
         # TIP: If you open your Battlesnake URL in browser you should see this data
         return {
             "apiversion": "1",
-            "author": "",  # TODO: Your Battlesnake Username
-            "color": "#888888",  # TODO: Personalize
-            "head": "default",  # TODO: Personalize
+            "author": "adukhounik",  # TODO: Your Battlesnake Username
+            "color": "#FF00F0",  # TODO: Personalize
+            "head": "beluga",  # TODO: Personalize
             "tail": "default",  # TODO: Personalize
         }
 
@@ -43,12 +39,11 @@ class Battlesnake(object):
         # TODO: Use the information in cherrypy.request.json to decide your next move.
         data = cherrypy.request.json
 
-        # Choose a random direction to move in
-        possible_moves = ["up", "down", "left", "right"]
-        move = random.choice(possible_moves)
+        parsed_request = MovePostRequest.from_dict(data)
+        move = make_next_move(parsed_request)
 
         print(f"MOVE: {move}")
-        return {"move": move}
+        return {"move": move.value}
 
     @cherrypy.expose
     @cherrypy.tools.json_in()
@@ -67,5 +62,8 @@ if __name__ == "__main__":
     cherrypy.config.update(
         {"server.socket_port": int(os.environ.get("PORT", "8080")),}
     )
+    cherrypy.config.update({
+        'server.thread_pool': 20
+    })
     print("Starting Battlesnake Server...")
     cherrypy.quickstart(server)
