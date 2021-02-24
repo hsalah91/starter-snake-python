@@ -173,7 +173,7 @@ def evaluate_food(board, request: MovePostRequest):
 
     desired_food = ranked_food[0]
     for food in ranked_food:
-        desired_food = max(desired_food, food)
+        desired_food = max(food, desired_food)
 
     print('desired foooood')
     print(desired_food)
