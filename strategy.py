@@ -175,6 +175,8 @@ def evaluate_food(board, request: MovePostRequest):
     for food in ranked_food:
         desired_food = max(desired_food, food)
 
+    print('desired foooood')
+    print(desired_food)
     return desired_food.cell
 
 
