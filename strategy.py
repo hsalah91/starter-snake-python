@@ -129,17 +129,17 @@ def find_desired_food(request: MovePostRequest):
     return desired_food
 
 
-def not_snake_or_hazard(cell, board):
+def not_snake_or_hazard(cell, board, you):
     if cell in board.hazards:
         return False
     for snake in board.snakes:
-        if cell in snake.body:
+        if snake.id != you and cell in snake.body:
             return False
 
     return True;
 
 
-def calculate_food_safety_score(food, board):
+def calculate_food_safety_score(food, board, you):
     score = 0
     margin = 6
     # get bottom left as we treat the food as if it is in the center
@@ -147,14 +147,15 @@ def calculate_food_safety_score(food, board):
     start_y = food.y - margin/2
     for i in range(margin):
         for j in range(margin):
-            if not_snake_or_hazard(Cell(start_x + i, start_y + j), board):
-                score+= 1
+            if not_snake_or_hazard(Cell(start_x + i, start_y + j), board, you):
+                score+= 10
+            else:
+                score-= 10
     return score
 
 def calculate_score(food, board ,request):
-    score = 0;
     distance_from_my_head = dist_between_cells(food, request.you.head) + 1
-    safety = calculate_food_safety_score(food, board)
+    safety = calculate_food_safety_score(food, board, request.you.id)
     health = request.you.health
 
     score = (1/health) + (1/distance_from_my_head) + safety
